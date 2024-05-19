@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyAyD22MsRYRAYvlQrjv2XTB1OdYz5u_3pw</string>
+	<key>GCM_SENDER_ID</key>
+	<string>315551976468</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.iotapp.sdp4</string>
+	<key>PROJECT_ID</key>
+	<string>remotelycontrollediotdevices</string>
+	<key>STORAGE_BUCKET</key>
+	<string>remotelycontrollediotdevices.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:315551976468:ios:dcdaa0a3a7817d3184ab01</string>
+	<key>DATABASE_URL</key>
+	<string>https://remotelycontrollediotdevices-default-rtdb.asia-southeast1.firebasedatabase.app</string>
+</dict>
+</plist>
