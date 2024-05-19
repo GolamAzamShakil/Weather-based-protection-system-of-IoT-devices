@@ -49,12 +49,13 @@ class _RunState extends State<Run> {
       extendBody: true,
       body: pages[_currentIndex],
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 20.0),
+        padding: const EdgeInsets.only(bottom: 5.0),
         child: DotNavigationBar(
           margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10),
           enableFloatingNavBar: true,
           dotIndicatorColor: Colors.transparent,
-          unselectedItemColor: Colors.grey[300],
+          //selectedItemColor: Theme.of(context).colorScheme.onSurface,
+          unselectedItemColor: Theme.of(context).colorScheme.inversePrimary,
           itemPadding: const EdgeInsets.all(10),
           marginR: const EdgeInsets.symmetric(horizontal: 80, vertical: 0),
           paddingR: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
@@ -65,15 +66,17 @@ class _RunState extends State<Run> {
           items: [
             DotNavigationBarItem(
               icon: const Icon(Icons.devices_fold_rounded),
-              selectedColor: const Color(0xff73544C),
+              selectedColor: Theme.of(context).colorScheme.onSurface,
             ),
             DotNavigationBarItem(
               icon: const Icon(Icons.home),
-              selectedColor: const Color(0xff73544C),
+              selectedColor: Theme.of(context).colorScheme.onSurface,
             ),
             DotNavigationBarItem(
               icon: const Icon(Icons.person_2_rounded),
-              selectedColor: const Color(0xff73544C),
+              selectedColor: Theme.of(context)
+                  .colorScheme
+                  .onSurface, //const Color(0xff73544C),
             ),
           ],
         ),

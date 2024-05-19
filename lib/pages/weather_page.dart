@@ -16,15 +16,14 @@ class _WeatherPageState extends State<WeatherPage> {
     FirebaseAuth.instance.signOut();
   }*/
 
-  final _fetchingWeatherData =
-      FetchingWeatherData('${dotenv.env['API_KEY']}');
+  final _fetchingWeatherData = FetchingWeatherData('${dotenv.env['API_KEY']}');
   WeatherDataModel? _weatherData;
 
   _fetchWeather() async {
     String city = await _fetchingWeatherData.getCurrentCity();
 
     try {
-      final weather = await _fetchingWeatherData.getWeatherData(city);
+      final weather = await _fetchingWeatherData.getWeatherData("Dhaka");
       setState(() {
         _weatherData = weather;
       });
@@ -90,21 +89,34 @@ class _WeatherPageState extends State<WeatherPage> {
             children: [
               Container(
                 alignment: Alignment.topLeft,
-                margin: const EdgeInsets.only(right: 50.0, left: 3.5),
+                padding: const EdgeInsets.only(left: 25, top: 5, bottom: 5),
                 child: Text(_weatherData?.city ?? "loading city.."),
               ),
               const SizedBox(height: 20),
               Center(
                 child: Container(
                   alignment: Alignment.topCenter,
-                  margin: const EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Lottie.asset(getWeatherAnimation(_weatherData?.data)),
-                      Text('${_weatherData?.temp.round()}°C'),
-                      Text(_weatherData?.data ?? ""),
-                      const SizedBox(height: 5),
+                      Container(
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.all(25),
+                        child: Lottie.asset(
+                            width: MediaQuery.of(context).size.width - 30,
+                            height: 240,
+                            //fit: BoxFit.cover,
+                            getWeatherAnimation(_weatherData?.data)),
+                      ),
+                      Container(
+                        alignment: Alignment.topCenter,
+                        child: Text(
+                            '${_weatherData?.temp.round()}°C   ${_weatherData?.data ?? ""}'),
+                      ),
+                      const SizedBox(height: 10),
+                      const Divider(),
+                      const SizedBox(height: 10),
                       Container(
                         height: 300,
                         decoration: BoxDecoration(
@@ -147,7 +159,11 @@ class _WeatherPageState extends State<WeatherPage> {
                                   ),
                                 ],
                               ),
-                              const Divider(),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.6,
+                                height: 2,
+                                child: const Divider(),
+                              ),
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
