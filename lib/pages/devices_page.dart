@@ -114,6 +114,14 @@ class _DevicesPageState extends State<DevicesPage> {
                       horizontal: 10,
                       vertical: 10,
                     ),
+                    isThreeLine: false,
+                    //shape: ShapeBorder.,
+                    //style: ,
+                    //tileColor: Colors.blueGrey[100],
+                    selectedColor: Colors.grey[350],
+                    iconColor: Colors.tealAccent,
+                    //titleTextStyle: ,
+                    //titleAlignment: ListTileTitleAlignment.center,
                     title: Text(deviceText),
                     subtitle: Text(deviceID.toString()),
                     trailing: Row(
@@ -127,7 +135,23 @@ class _DevicesPageState extends State<DevicesPage> {
                             });
                           },
                           icon: const Icon(Icons.developer_board_off_rounded),
-                        )
+                        ),
+                        Switch(
+                          value: true,
+                          onChanged: (bool? value) {
+                            if (value == true) {
+                              realTime.child(deviceID.toString()).set({
+                                //'title': deviceText,
+                                'condition': 1,
+                              });
+                            }
+                            realTime.child(deviceID.toString()).set({
+                              //'title': deviceText,
+                              'condition': 0,
+                            });
+                            value = false;
+                          },
+                        ),
                       ],
                     ),
                   ),
