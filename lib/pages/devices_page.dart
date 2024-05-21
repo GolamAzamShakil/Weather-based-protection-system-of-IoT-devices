@@ -12,6 +12,8 @@ class DevicesPage extends StatefulWidget {
 }
 
 class _DevicesPageState extends State<DevicesPage> {
+  bool _enabled = true;
+
   final FirebaseDevices firebaseDevices = FirebaseDevices();
 
   final realTime = FirebaseDatabase.instance.ref("devices");
@@ -60,6 +62,7 @@ class _DevicesPageState extends State<DevicesPage> {
   Widget build(BuildContext context) {
     var _width = MediaQuery.of(context).size.width / 100;
     var _height = MediaQuery.of(context).size.height / 100;
+    //bool _enabled = true;
 
     return Scaffold(
       appBar: AppBar(
@@ -124,7 +127,7 @@ class _DevicesPageState extends State<DevicesPage> {
                     //titleAlignment: ListTileTitleAlignment.center,
                     title: Text(deviceText),
                     subtitle: Text(deviceID.toString()),
-                    trailing: Row(
+                    /*trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
@@ -153,6 +156,22 @@ class _DevicesPageState extends State<DevicesPage> {
                           },
                         ),
                       ],
+                    ),*/
+                    trailing: Switch(
+                      value: _enabled,
+                      onChanged: (bool value) {
+                        realTime.child(deviceID.toString()).set({
+                          //'title': deviceText,
+                          'condition': _enabled.toString(),
+                        });
+                        setState(() {
+                          /*realTime.child(deviceID.toString()).set({
+                            //'title': deviceText,
+                            'condition': value.toString(),
+                          });*/
+                          _enabled = value;
+                        });
+                      },
                     ),
                   ),
                 );
