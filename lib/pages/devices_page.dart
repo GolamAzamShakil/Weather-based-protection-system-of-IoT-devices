@@ -13,16 +13,16 @@ class DevicesPage extends StatefulWidget {
 
 class _DevicesPageState extends State<DevicesPage> {
   bool _enabled = true;
+  List<bool> enabled = [];
+  //var enabled = [];
+  //var enabled = List<bool>();
+  String _deviceID = '';
 
   final FirebaseDevices firebaseDevices = FirebaseDevices();
 
-  final realTime = FirebaseDatabase.instance.ref("devices");
+  final realTime = FirebaseDatabase.instance.ref();
 
   final TextEditingController textController = TextEditingController();
-
-  late VoidCallback? realtimeUpdate;
-
-  String deviceName = "test";
 
   /*void updateDevice({String? deviceID}) {
     realTime.update({
@@ -59,15 +59,54 @@ class _DevicesPageState extends State<DevicesPage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    readRealTime();
+    //readRealTimeOnce();
+  }
+
+  void readRealTime() {
+    realTime.child('devices').onValue.listen((event) {
+      //final realData = Map<String, dynamic>.from(event.snapshot.value);
+      DataSnapshot dataSnapshot = event.snapshot;
+
+      //Object? values = dataSnapshot.value;
+
+      if (dataSnapshot.exists) {
+        for (var child in dataSnapshot.children) {
+          print("\n${child.toString()}");
+        }
+      }
+    });
+  }
+
+  void readRealTimeOnce() {
+    /*realTime.child('devices').get().then((snapshot) {
+      final realData = Map<String, dynamic>.from(snapshot.value);
+    });*/
+  }
+
+  @override
   Widget build(BuildContext context) {
     var _width = MediaQuery.of(context).size.width / 100;
     var _height = MediaQuery.of(context).size.height / 100;
     //bool _enabled = true;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16))),
         title: const Center(child: Text("D E V I C E S")),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        titleTextStyle: const TextStyle(
+          color: Color(0xffe2e2e9),
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+        centerTitle: true,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         //backgroundColor: Colors.transparent,
         elevation: 0,
         /*actions: [
@@ -78,9 +117,14 @@ class _DevicesPageState extends State<DevicesPage> {
         ],*/
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: Theme.of(context).colorScheme.primary,
         onPressed: deviceAdd,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        clipBehavior: Clip.antiAlias,
+        elevation: 8,
         child: const Icon(Icons.add),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       body: StreamBuilder<QuerySnapshot>(
         stream: firebaseDevices.getDevices(),
         builder: (context, snapshot) {
@@ -97,13 +141,23 @@ class _DevicesPageState extends State<DevicesPage> {
                     document.data() as Map<String, dynamic>;
                 String deviceText = data['device'];
 
+                //enabled = List<bool>.filled(devicesList.length, true);
+                //enabled.fillRange(0, 3, true);
+                if (enabled.isEmpty) {
+                  enabled = List<bool>.filled(devicesList.length, true);
+                }
+
+                if (_deviceID.isEmpty) {
+                  _deviceID = deviceID;
+                }
+
                 return Slidable(
                   startActionPane: ActionPane(
                     motion: const BehindMotion(),
                     children: [
                       SlidableAction(
                         onPressed: (context) {
-                          realTime.child(deviceID.toString()).set({
+                          realTime.child('devices/${deviceID.toString()}').set({
                             //'title': deviceText,
                             'condition': 0,
                           });
@@ -158,18 +212,21 @@ class _DevicesPageState extends State<DevicesPage> {
                       ],
                     ),*/
                     trailing: Switch(
-                      value: _enabled,
+                      value: enabled[index], //enabled[index],
                       onChanged: (bool value) {
-                        realTime.child(deviceID.toString()).set({
+                        /*realTime.child(deviceID.toString()).set({
                           //'title': deviceText,
-                          'condition': _enabled.toString(),
-                        });
+                          'condition': enabled[index].toString(),
+                        });*/
+                        print(enabled);
+                        //enabled[index] = value;
                         setState(() {
-                          /*realTime.child(deviceID.toString()).set({
-                            //'title': deviceText,
+                          realTime.child('devices/${deviceID.toString()}').set({
+                            'title': deviceText,
                             'condition': value.toString(),
-                          });*/
-                          _enabled = value;
+                          });
+                          enabled[index] = value;
+                          print(enabled);
                         });
                       },
                     ),

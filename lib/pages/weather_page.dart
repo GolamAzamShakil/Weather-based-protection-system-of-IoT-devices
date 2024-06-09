@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:liquid_pull_to_refresh/liquid_pull_to_refresh.dart';
 import 'package:lottie/lottie.dart';
 import 'package:sdp4/components/weather_data_model.dart';
 import 'package:sdp4/features/fetching_weather_data.dart';
@@ -12,29 +14,41 @@ class WeatherPage extends StatefulWidget {
 }
 
 class _WeatherPageState extends State<WeatherPage> {
+  final _searchController = TextEditingController();
+  String? _searchText;
+
   /*void signUserOut() {
     FirebaseAuth.instance.signOut();
   }*/
 
-  final _fetchingWeatherData = FetchingWeatherData('${dotenv.env['API_KEY']}');
+  final _fetchingWeatherData =
+      FetchingWeatherData('${dotenv.env['WEATHER_API_KEY']}');
   WeatherDataModel? _weatherData;
 
-  _fetchWeather() async {
-    String city = await _fetchingWeatherData.getCurrentCity();
+  Future<void> _fetchWeather() async {
+    String city;
+    //String city = await _fetchingWeatherData.getCurrentCity();
+    if (_searchText == null) {
+      city = await _fetchingWeatherData.getCurrentCity();
+    } else {
+      city = _searchText![0].toUpperCase() + _searchText!.substring(1);
+      /*bodyContent(MediaQuery.of(context).size.width,
+          MediaQuery.of(context).size.height, context);*/
+    }
 
     try {
-      final weather = await _fetchingWeatherData.getWeatherData("Dhaka");
+      final weather = await _fetchingWeatherData.getWeatherData(city);
       setState(() {
         _weatherData = weather;
       });
     } catch (e) {
-      print(e);
+      print(e.toString());
     }
   }
 
   String getWeatherAnimation(String? data) {
     if (data == null) {
-      return 'assets/';
+      return 'assets/Dirigible.json';
     }
 
     switch (data.toLowerCase()) {
@@ -67,12 +81,31 @@ class _WeatherPageState extends State<WeatherPage> {
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    var _height = MediaQuery.of(context).size.height;
+    var _width = MediaQuery.of(context).size.width;
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16))),
         title: const Center(child: Text("W E A T H E R")),
-        foregroundColor: Theme.of(context).colorScheme.inversePrimary,
-        backgroundColor: Colors.transparent,
+        titleTextStyle: const TextStyle(
+          color: Color(0xffe2e2e9),
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+        centerTitle: true,
+        //foregroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
         /*actions: [
           IconButton(
@@ -83,128 +116,192 @@ class _WeatherPageState extends State<WeatherPage> {
       ),
       extendBody: true,
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Container(
-                alignment: Alignment.topLeft,
-                padding: const EdgeInsets.only(left: 25, top: 5, bottom: 5),
-                child: Text(_weatherData?.city ?? "loading city.."),
+        child: bodyContent(_width, _height, context),
+      ),
+    );
+  }
+
+  LiquidPullToRefresh bodyContent(
+      double _width, double _height, BuildContext context) {
+    return LiquidPullToRefresh(
+      color: Theme.of(context).colorScheme.primary,
+      backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+      showChildOpacityTransition: false,
+      onRefresh: _fetchWeather,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              height: 60,
+              width: _width,
+              alignment: Alignment.topLeft,
+              padding: const EdgeInsets.only(
+                top: 15,
               ),
-              const SizedBox(height: 20),
-              Center(
-                child: Container(
-                  alignment: Alignment.topCenter,
-                  padding: const EdgeInsets.all(5),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.all(25),
-                        child: Lottie.asset(
-                            width: MediaQuery.of(context).size.width - 30,
-                            height: 240,
-                            //fit: BoxFit.cover,
-                            getWeatherAnimation(_weatherData?.data)),
+              child: Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 30, right: 20),
+                    child: Text(
+                      _weatherData?.city ?? "loading city..",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13.0,
                       ),
-                      Container(
-                        alignment: Alignment.topCenter,
-                        child: Text(
-                            '${_weatherData?.temp.round()}°C   ${_weatherData?.data ?? ""}'),
-                      ),
-                      const SizedBox(height: 10),
-                      const Divider(),
-                      const SizedBox(height: 10),
-                      Container(
-                        height: 300,
-                        decoration: BoxDecoration(
-                          color: Colors.teal[300],
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 20, horizontal: 10),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      //Lottie.asset('horizon.json'),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      infoCard(
-                                          title: "Humidity",
-                                          value: "${_weatherData?.humidity}"),
-                                    ],
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      //Lottie.asset(''),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      infoCard(
-                                          title: "Feels like",
-                                          value: "${_weatherData?.feelsLike}"),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.6,
-                                height: 2,
-                                child: const Divider(),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      //Lottie.asset('Thermometer Hot.json'),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      infoCard(
-                                          title: "Max temp",
-                                          value: "${_weatherData?.maxTemp}"),
-                                    ],
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      //Lottie.asset('Thermometer Cold.json'),
-                                      const SizedBox(
-                                        height: 5,
-                                      ),
-                                      infoCard(
-                                          title: "Min temp",
-                                          value: "${_weatherData?.minTemp}"),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
+                  const SizedBox(width: 15),
+                  Container(
+                    width: _width * 0.55,
+                    height: 55,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.onTertiary,
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: const InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.search_rounded,
+                          //shadows: [BoxShadow],
+                        ),
+                        hintText: "Set location..",
+                        hintStyle: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey,
+                        ),
+                        border: InputBorder.none,
+                        filled: false,
+                      ),
+                      onSubmitted: (String value) {
+                        setState(() {
+                          _searchText = _searchController.text;
+                          print(_searchText![0].toUpperCase() +
+                              _searchText!.substring(1));
+                        });
+                        _searchController.clear();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: Container(
+                //height: _height * 0.4,
+                width: _width,
+                alignment: Alignment.topCenter,
+                padding: const EdgeInsets.all(5),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      //height: _height * 0.4,
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.all(25),
+                      child: Lottie.asset(
+                          //width: MediaQuery.of(context).size.width - 30,
+                          height: _height * 0.3,
+                          fit: BoxFit.contain,
+                          getWeatherAnimation(_weatherData?.data)),
+                    ),
+                    Container(
+                      alignment: Alignment.topCenter,
+                      child: Text(
+                          '${_weatherData?.temp.round()}°C   ${_weatherData?.data ?? ""}'),
+                    ),
+                    const SizedBox(height: 10),
+                    const Divider(),
+                    const SizedBox(height: 10),
+                    Container(
+                      height: _height * 0.3,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 20, horizontal: 10),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    //Lottie.asset('horizon.json'),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    infoCard(
+                                        title: "Humidity",
+                                        value: "${_weatherData?.humidity}"),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    //Lottie.asset(''),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    infoCard(
+                                        title: "Feels like",
+                                        value: "${_weatherData?.feelsLike}"),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.6,
+                              height: 2,
+                              child: const Divider(),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    //Lottie.asset('Thermometer Hot.json'),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    infoCard(
+                                        title: "Max temp",
+                                        value: "${_weatherData?.maxTemp}"),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    //Lottie.asset('Thermometer Cold.json'),
+                                    const SizedBox(
+                                      height: 5,
+                                    ),
+                                    infoCard(
+                                        title: "Min temp",
+                                        value: "${_weatherData?.minTemp}"),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              //const SizedBox(height: 5),
-            ],
-          ),
+            ),
+            //const SizedBox(height: 5),
+          ],
         ),
       ),
     );

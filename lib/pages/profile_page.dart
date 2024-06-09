@@ -18,10 +18,21 @@ class _ProfilePageState extends State<ProfilePage> {
     var _width = MediaQuery.of(context).size.width / 100;
     var _height = MediaQuery.of(context).size.height / 100;
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(16),
+                bottomRight: Radius.circular(16))),
         title: const Center(child: Text("P R O F I L E")),
-        foregroundColor: Theme.of(context).colorScheme.inversePrimary,
-        backgroundColor: Colors.transparent,
+        titleTextStyle: const TextStyle(
+          color: Color(0xffe2e2e9),
+          fontWeight: FontWeight.w500,
+          fontSize: 16,
+        ),
+        centerTitle: true,
+        //foregroundColor: Theme.of(context).colorScheme.inversePrimary,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
         actions: [
           IconButton(
