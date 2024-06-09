@@ -24,11 +24,11 @@ class _ProfilePageState extends State<ProfilePage> {
             borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16))),
-        title: const Center(child: Text("P R O F I L E")),
+        title: const Text("P R O F I L E"),
         titleTextStyle: const TextStyle(
           color: Color(0xffe2e2e9),
           fontWeight: FontWeight.w500,
-          fontSize: 16,
+          fontSize: 17,
         ),
         centerTitle: true,
         //foregroundColor: Theme.of(context).colorScheme.inversePrimary,

@@ -99,11 +99,11 @@ class _DevicesPageState extends State<DevicesPage> {
             borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(16),
                 bottomRight: Radius.circular(16))),
-        title: const Center(child: Text("D E V I C E S")),
+        title: const Text("D E V I C E S"),
         titleTextStyle: const TextStyle(
           color: Color(0xffe2e2e9),
           fontWeight: FontWeight.w500,
-          fontSize: 16,
+          fontSize: 17,
         ),
         centerTitle: true,
         backgroundColor: Theme.of(context).colorScheme.primary,
